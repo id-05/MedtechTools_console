@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXTabPane?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<GridPane alignment="center" hgap="10" prefHeight="598.0" prefWidth="835.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <JFXTabPane prefHeight="631.0" prefWidth="825.0">
+         <tabs>
+            <Tab text="Главная">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="495.0">
+
+                     <children>
+                        <LineChart fx:id="lineChart" animated="false" axisSortingPolicy="NONE" centerShape="false" layoutX="75.0" layoutY="27.0" legendVisible="false" prefHeight="224.0" prefWidth="591.0" title="U(t),c" titleSide="BOTTOM">
+                            <xAxis>
+                                <NumberAxis side="BOTTOM" fx:id="xAxis" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxis" layoutX="10.0" side="LEFT" />
+                            </yAxis>
+                        </LineChart>
+                        <Button fx:id="startBut" layoutX="14.0" layoutY="102.0" mnemonicParsing="false" onAction="#startUI" text="Start" />
+                        <Button fx:id="stopBut" disable="true" layoutX="14.0" layoutY="139.0" mnemonicParsing="false" onAction="#stopUI" text="Stop" />
+                        <Slider fx:id="speed" blockIncrement="5.0" layoutX="151.0" layoutY="279.0" majorTickUnit="5.0" max="150.0" min="5.0" onDragEntered="#changeSpeed" onMouseReleased="#changeSpeed" value="50.0" />
+                        <Label layoutX="75.0" layoutY="276.0" text="Vdt =" />
+                        <Pane layoutY="448.0" prefHeight="26.0" prefWidth="686.0" style="-fx-background-color: gray;">
+                           <children>
+                              <Label fx:id="connectStatus" layoutX="496.0" layoutY="5.0" style="-fx-text-fill: white;" text="Label" />
+                           </children>
+                        </Pane>
+                        <Label fx:id="Vdt" layoutX="113.0" layoutY="277.0" text="Label" />
+                        <Label layoutX="321.0" layoutY="276.0" text="Count =" />
+                        <Label fx:id="count" layoutX="371.0" layoutY="277.0" text="Label" />
+                        <Slider fx:id="countSlider" layoutX="411.0" layoutY="275.0" max="1000.0" min="100.0" onMouseReleased="#changeCount" prefHeight="14.0" prefWidth="186.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="120.0" />
+                     </children></AnchorPane>
+
+              </content>
+            </Tab>
+            <Tab text="Настройки">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <JFXTextField fx:id="text1" layoutX="41.0" layoutY="14.0" prefHeight="37.0" prefWidth="159.0" />
+                        <JFXButton buttonType="RAISED" layoutX="14.0" layoutY="74.0" onAction="#onClickMethod" text="Test USB library" textOverrun="CLIP" />
+                        <JFXCheckBox fx:id="checkBox1" layoutX="24.0" layoutY="256.0" onAction="#onCheckMethod" text="Led Blinck" />
+                        <JFXButton layoutX="14.0" layoutY="106.0" text="Find device" />
+                        <JFXButton buttonType="RAISED" layoutX="15.0" layoutY="136.0" text="Read Usb - once" />
+                        <SplitPane dividerPositions="0.5, 0.5, 0.5, 0.5, 0.5" layoutX="236.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="298.0" prefWidth="259.0">
+                           <items>
+                              <JFXTextField editable="false" text="Запрос:" />
+                              <JFXTextField fx:id="textquestion" />
+                              <JFXButton onAction="#sendAT" text="Отправить на устройство" />
+                              <JFXTextField editable="false" text="Ответ:" />
+                              <JFXTextField fx:id="taxtanswer" />
+                              <JFXButton text="Получить ответ" />
+                           </items>
+                        </SplitPane>
+                        <JFXButton layoutX="15.0" layoutY="172.0" text="Start loop read" />
+                        <JFXButton layoutX="15.0" layoutY="207.0" text="Stop loop read" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+            <Tab text="ИВЛ Симулятор">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <LineChart fx:id="lineChartPres" animated="false" axisSortingPolicy="NONE" centerShape="false" layoutX="352.0" layoutY="34.0" legendVisible="false" prefHeight="169.0" prefWidth="437.0" title="PRESSURE" titleSide="BOTTOM">
+                           <xAxis>
+                              <NumberAxis side="BOTTOM" fx:id="xAxisPres" />
+                           </xAxis>
+                           <yAxis>
+                              <NumberAxis fx:id="yAxisPres" layoutX="10.0" side="LEFT" />
+                           </yAxis>
+                        </LineChart>
+                        <Button fx:id="generate" layoutX="494.0" layoutY="448.0" mnemonicParsing="false" onAction="#generateDemo" text="Generate once" />
+                        <TextArea fx:id="outDemo" layoutX="314.0" layoutY="510.0" prefHeight="35.0" prefWidth="497.0" />
+                        <LineChart fx:id="lineChartFlow" layoutX="352.0" layoutY="203.0" prefHeight="163.0" prefWidth="447.0" title="FLOW" titleSide="BOTTOM">
+                            <xAxis>
+                                <NumberAxis side="BOTTOM" fx:id="xAxisFlow" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxisFlow" layoutX="10.0" side="LEFT" />
+                            </yAxis>
+                        </LineChart>
+                        <Pane layoutY="24.0" prefHeight="138.0" prefWidth="214.0">
+                           <children>
+                              <Label fx:id="volumeLabel" alignment="CENTER" layoutX="74.0" layoutY="-7.0" text="700">
+                                 <font>
+                                    <Font size="43.0" />
+                                 </font>
+                              </Label>
+                              <Slider fx:id="volumeSlider" blockIncrement="100.0" layoutX="39.0" layoutY="64.0" max="1200.0" showTickLabels="true" showTickMarks="true" value="700.0" />
+                              <Label layoutX="85.0" layoutY="98.0" text="VOLUME" />
+                           </children>
+                        </Pane>
+                        <Pane layoutY="153.0" prefHeight="138.0" prefWidth="214.0">
+                           <children>
+                              <Label fx:id="freqLabel" layoutX="86.0" text="10">
+                                 <font>
+                                    <Font size="43.0" />
+                                 </font>
+                              </Label>
+                              <Slider fx:id="freqSlider" blockIncrement="1.0" layoutX="39.0" layoutY="64.0" max="20.0" min="5.0" showTickLabels="true" showTickMarks="true" value="10.0" />
+                              <Label layoutX="74.0" layoutY="101.0" text="FREQUENCY" />
+                           </children>
+                        </Pane>
+                        <Pane layoutY="285.0" prefHeight="138.0" prefWidth="214.0">
+                           <children>
+                              <Label fx:id="ieratioLabel" layoutX="86.0" text="1:2">
+                                 <font>
+                                    <Font size="43.0" />
+                                 </font>
+                              </Label>
+                              <Slider blockIncrement="0.1" layoutX="39.0" layoutY="64.0" max="2.0" min="1.0" showTickLabels="true" showTickMarks="true" value="2.0" />
+                              <Label layoutX="86.0" layoutY="101.0" text="I:E Ratio" />
+                           </children>
+                        </Pane>
+                        <Pane layoutX="170.0" layoutY="24.0" prefHeight="138.0" prefWidth="214.0">
+                           <children>
+                              <Label layoutX="84.0" text="10">
+                                 <font>
+                                    <Font size="43.0" />
+                                 </font>
+                              </Label>
+                              <Slider fx:id="presSlider" blockIncrement="1.0" layoutX="39.0" layoutY="64.0" min="10.0" showTickLabels="true" showTickMarks="true" value="50.0" />
+                              <Label layoutX="74.0" layoutY="101.0" text="PRESSURE LIMIT" />
+                           </children>
+                        </Pane>
+                        <Pane layoutX="170.0" layoutY="153.0" prefHeight="138.0" prefWidth="214.0">
+                           <children>
+                              <Label fx:id="peepLabel" layoutX="97.0" text="5">
+                                 <font>
+                                    <Font size="43.0" />
+                                 </font>
+                              </Label>
+                              <Slider fx:id="peepSlider" blockIncrement="1.0" layoutX="39.0" layoutY="64.0" max="10.0" onMouseReleased="#changePEEP" showTickLabels="true" showTickMarks="true" value="5.0" />
+                              <Label layoutX="96.0" layoutY="101.0" text="PEEP" />
+                           </children>
+                        </Pane>
+                        <Button layoutX="387.0" layoutY="398.0" mnemonicParsing="false" onAction="#startLoopGenerate" text="Start generate" />
+                        <Button layoutX="388.0" layoutY="448.0" mnemonicParsing="false" onAction="#stopGenerate" text="Stop generate" />
+                        <Slider fx:id="timeDt" layoutX="627.0" layoutY="379.0" min="1.0" onMouseReleased="#changeDtGenerate" showTickLabels="true" showTickMarks="true" value="10.0" />
+                     </children></AnchorPane>
+              </content>
+            </Tab>
+         </tabs>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </JFXTabPane>
+   </children>
+   <columnConstraints>
+      <ColumnConstraints />
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+   </rowConstraints>
+</GridPane>

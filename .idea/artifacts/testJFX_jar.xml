@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="testJFX:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/testJFX_jar</output-path>
+    <root id="archive" name="testJFX.jar">
+      <element id="module-output" name="testJFX" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/usb4java/1.3.0/usb4java-1.3.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-linux-x86.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-linux-x86-64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-win32-x86.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-win32-x86-64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-darwin-x86-64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-linux-arm.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.3.0/libusb4java-1.3.0-linux-aarch64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/JFoenix-master/jfoenix/build/libs/jfoenix-0.0.0-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/usb4java/usb4java-javax/1.3.0/usb4java-javax-1.3.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/javax/usb/usb-api/1.0.2/usb-api-1.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jfoenix-8.0.10.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

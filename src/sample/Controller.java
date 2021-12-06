@@ -1,12 +1,17 @@
 package sample;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.util.Duration;
 import org.usb4java.*;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -27,6 +32,8 @@ public class Controller implements Initializable {
     XYChart.Series<Number, Number> series2 = new XYChart.Series<>();
     XYChart.Series<Number, Number> seriesPres = new XYChart.Series<>();
     XYChart.Series<Number, Number> seriesFlow = new XYChart.Series<>();
+    XYChart.Series<Number, Number> seriesPresBuf = new XYChart.Series<>();
+    XYChart.Series<Number, Number> seriesFlowBuf = new XYChart.Series<>();
     int i = 0;
     int amountOfPoints = 120;
     int speedInt = 50;
@@ -44,6 +51,7 @@ public class Controller implements Initializable {
     byte[] bufbyte;
     int starti = 0;
     Breathing breathing;
+    private Timeline animation;
 
     @FXML
     public Label peepLabel, freqLabel, ieratioLabel, volumeLabel;
@@ -243,7 +251,6 @@ public class Controller implements Initializable {
     }
 
     public void startLoopGenerate(){
-        timer = new Timer(true);
         breathing = new Breathing(5);
         seriesPres.getData().clear();
         seriesFlow.getData().clear();
@@ -251,49 +258,51 @@ public class Controller implements Initializable {
         xAxisPres.setUpperBound(maxX);
         xAxisFlow.setLowerBound(0);
         xAxisFlow.setUpperBound(maxX);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(new Runnable() {
-                    @Override  public void run() {
-                        seriesPres.getData().add(new XYChart.Data<>(starti, (double)breathing.getYvalue(starti % pointBreath)));
-                        if(starti>maxX){
-                            xAxisPres.setLowerBound(starti-maxX);
-                            xAxisPres.setUpperBound(starti);
-                            xAxisFlow.setLowerBound(starti-maxX);
-                            xAxisFlow.setUpperBound(starti);
-                        }
-                        starti++;
-                        if(starti>1){
-                            float y = seriesPres.getData().get(starti-2).getYValue().floatValue() - seriesPres.getData().get(starti-1).getYValue().floatValue();
-                            seriesFlow.getData().add(new XYChart.Data<>(starti, -y*50));
-                        }
-                    }
-                });
-            }
-        }, 0, speedGenerate);
+
+        final KeyFrame frame =
+                new KeyFrame(Duration.millis(17),
+                        (ActionEvent actionEvent) -> {
+                            updateChart();
+                        });
+        animation = new Timeline();
+        animation.getKeyFrames().add(frame);
+        animation.setCycleCount(Animation.INDEFINITE);
+        animation.play();
+    }
+
+    public void updateChart(){
+        seriesPres.getData().add(new XYChart.Data<>(starti, breathing.getYvalue(starti % pointBreath)));
+        if(starti>maxX){
+            xAxisPres.setLowerBound(starti-maxX);
+            xAxisPres.setUpperBound(starti);
+            xAxisFlow.setLowerBound(starti-maxX);
+            xAxisFlow.setUpperBound(starti);
+        }
+        starti++;
+        if(starti>1){
+            float y = seriesPres.getData().get(starti-2).getYValue().floatValue() - seriesPres.getData().get(starti-1).getYValue().floatValue();
+            seriesFlow.getData().add(new XYChart.Data<>(starti, -y*50));
+        }
     }
 
     public void stopGenerate(){
-        timer.cancel();
+        animation.stop();
+        //;timer.cancel();
         starti = 0;
         seriesPres.getData().clear();
         seriesFlow.getData().clear();
     }
 
     public void changeDtGenerate(){
-        timer.cancel();
         speedGenerate = (int)timeDt.getValue();
         seriesPres.getData().clear();
         seriesFlow.getData().clear();
         startLoopGenerate();
-        //Vdt.setText(String.format("%.0f", (1/(speedInt*0.001)))+" Гц");
     }
 
     public void changePEEP(){
         peepLabel.setText(String.format("%.0f",peepSlider.getValue()));
         breathing.setPEEP((int)peepSlider.getValue());
-        //startGenerate();
     }
 
     public void changeVolume(){
@@ -309,15 +318,8 @@ public class Controller implements Initializable {
     }
 
     public void generateDemo(){
-     //   StringBuilder sb = new StringBuilder();
         int delta = 1000;
-//        float sum = 0;
-//        int j = 0;
-//        int startI = 0;
-//        int stopI = 0;
-//        float buf = 0;
         for(int i=1; i<400; i++){
-
 
             double bufi = (double) i / 100;
             double y = 0;
@@ -334,8 +336,6 @@ public class Controller implements Initializable {
             }
             seriesPres.getData().add(new XYChart.Data<>(i, yFlow));
 
-
-
             if(i<100){
                 y = (pow((bufi),(double) (4/bufi)) * delta);
             }
@@ -351,29 +351,8 @@ public class Controller implements Initializable {
             if((i>280)){
                 y =-(pow(0.8*(bufi-4),2)*delta);
             }
-
-            //y = round((sin(i*(2*3.14/400))+1)*2047);
             seriesFlow.getData().add(new XYChart.Data<>(i, y));
-//
-//            if((y>0)&&(buf==0)){
-//                startI = i;
-//            }
-//
-//            if((y==0)&&(buf>0)){
-//                stopI = i;
-//            }
-//
-//            if(y>0){
-//                sum = sum + (float)y;
-//                j++;
-//            }
-//            sb.append(round(y)).append(",");
-//            buf = (float)y;
         }
-//        float s = (stopI-startI)*(sum)/j;
-//        outDemo.setText(sb.toString()+"\n\ns = "+s+
-//                "\n\nstart = "+startI+
-//                "\n\nstop = "+stopI);
     }
 
     public void stopUI() throws InterruptedException {
@@ -384,7 +363,6 @@ public class Controller implements Initializable {
         }
         stop = true;
         timer.cancel();
-
         spiroDevice.write(bufbyte);
         spiroDevice.close();
         startBut.setDisable(false);
@@ -398,12 +376,9 @@ public class Controller implements Initializable {
             bufbyte[i]='L';
         }
         stop = false;
-
         spiroDevice.open();
         spiroDevice.write(bufbyte);
-
         startLoopRead();
-
         startBut.setDisable(true);
         stopBut.setDisable(false);
     }
@@ -456,8 +431,12 @@ public class Controller implements Initializable {
         lineChart.getData().add(series2);
 
         lineChartPres.setCreateSymbols(false);
+        lineChartPres.setAnimated(false);
+        lineChartPres.setCreateSymbols(false);
         lineChartPres.getData().add(seriesPres);
 
+        lineChartFlow.setCreateSymbols(false);
+        lineChartFlow.setAnimated(false);
         lineChartFlow.setCreateSymbols(false);
         lineChartFlow.getData().add(seriesFlow);
 

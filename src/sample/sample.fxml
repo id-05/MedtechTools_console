@@ -91,7 +91,7 @@
                               <NumberAxis fx:id="yAxisPres" layoutX="10.0" side="LEFT" />
                            </yAxis>
                         </LineChart>
-                        <Button fx:id="generate" layoutX="494.0" layoutY="448.0" mnemonicParsing="false" onAction="#generateDemo" text="Generate once" />
+                        <Button fx:id="generate" layoutX="528.0" layoutY="448.0" mnemonicParsing="false" onAction="#generateDemo" text="Generate once" />
                         <TextArea fx:id="outDemo" layoutX="314.0" layoutY="510.0" prefHeight="35.0" prefWidth="497.0" />
                         <LineChart fx:id="lineChartFlow" layoutX="352.0" layoutY="203.0" prefHeight="163.0" prefWidth="447.0" title="FLOW" titleSide="BOTTOM">
                             <xAxis>

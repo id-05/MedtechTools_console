@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.animation.Animation;
+import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -52,6 +53,7 @@ public class Controller implements Initializable {
     int starti = 0;
     Breathing breathing;
     private Timeline animation;
+    AnimationTimer animationTimer;
 
     @FXML
     public Label peepLabel, freqLabel, ieratioLabel, volumeLabel;
@@ -224,7 +226,7 @@ public class Controller implements Initializable {
                     yPres = buf;
                 }
             }
-            if((i>200)&&(i<282)){
+            if((i>200)&&(i<=282)){
                 buf = (pow((2),((0.5)))*delta);
                 if(buf<peepSlider.getValue() * kdelta){
                     yPres = peepSlider.getValue() * kdelta;
@@ -232,7 +234,7 @@ public class Controller implements Initializable {
                     yPres = buf;
                 }
             }
-            if(i>281){
+            if(i>282){
                 buf = (pow((bufi-4),2)*delta);
                 if(buf<peepSlider.getValue() * kdelta){
                     yPres = peepSlider.getValue() * kdelta;
@@ -259,15 +261,16 @@ public class Controller implements Initializable {
         xAxisFlow.setLowerBound(0);
         xAxisFlow.setUpperBound(maxX);
 
-        final KeyFrame frame =
-                new KeyFrame(Duration.millis(17),
-                        (ActionEvent actionEvent) -> {
-                            updateChart();
-                        });
-        animation = new Timeline();
-        animation.getKeyFrames().add(frame);
-        animation.setCycleCount(Animation.INDEFINITE);
-        animation.play();
+        animationTimer.start();
+//        final KeyFrame frame =
+//                new KeyFrame(Duration.millis(17),
+//                        (ActionEvent actionEvent) -> {
+//                            updateChart();
+//                        });
+//        animation = new Timeline();
+//        animation.getKeyFrames().add(frame);
+//        animation.setCycleCount(Animation.INDEFINITE);
+//        animation.play();
     }
 
     public void updateChart(){
@@ -286,7 +289,8 @@ public class Controller implements Initializable {
     }
 
     public void stopGenerate(){
-        animation.stop();
+        animationTimer.stop();
+        //animation.stop();
         //;timer.cancel();
         starti = 0;
         seriesPres.getData().clear();
@@ -448,5 +452,12 @@ public class Controller implements Initializable {
         countSlider.setValue(amountOfPoints);
         Vdt.setText(String.format("%.0f", (1/(speedInt*0.001)))+" Гц");
         count.setText(String.valueOf(amountOfPoints));
+
+        animationTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                updateChart();
+            }
+        };
     }
 }

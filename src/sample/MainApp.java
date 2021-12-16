@@ -1,174 +1,189 @@
 package sample;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXSlider;
+import com.jfoenix.controls.JFXSpinner;
+import com.jfoenix.controls.JFXTabPane;
+import eu.hansolo.fx.monitor.Monitor;
+import eu.hansolo.fx.monitor.MonitorBuilder;
+import eu.hansolo.fx.monitor.tools.Theme;
+import eu.hansolo.fx.monitor.tools.Timespan;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import javafx.collections.ObservableList;
-import javafx.scene.chart.NumberAxis.DefaultFormatter;
-import javafx.scene.chart.XYChart.Data;
 
+import javax.swing.*;
 
 
 public class MainApp extends Application {
 
-    private LineChart<Number, Number> chart;
-    private XYChart.Series<Number, Number> hourDataSeries;
-    private XYChart.Series<Number, Number> minuteDataSeries;
-    private NumberAxis xAxis;
-    private Timeline animation;
-    private double hours = 0;
-    private double minutes = 0;
-    private double timeInHours = 0;
-    private double prevY = 10;
-    private double y = 10;
+    //private GridPane grid;
+    private Monitor monitorPres, monitorFlow;
+    private int peep = 0;
+    private int volume = 700;
+    Breathing breath;
 
-    public void MainApp() {
+    public MainApp() {
         // 6 minutes data per frame
-        final KeyFrame frame =
-                new KeyFrame(Duration.millis(1000 / 60),
-                        (ActionEvent actionEvent) -> {
-                            for (int count = 0; count < 6; count++) {
-                                nextTime();
-                                plotTime();
-                            }
-                        });
-        // create timeline to add new data every 60th of second
-        animation = new Timeline();
-        animation.getKeyFrames().add(frame);
-        animation.setCycleCount(Animation.INDEFINITE);
+
     }
 
-//    public void updateChart(){
-//        seriesPres.getData().add(new XYChart.Data<>(starti, breathing.getYvalue(starti % pointBreath)));
-//        if(starti>maxX){
-//            xAxisPres.setLowerBound(starti-maxX);
-//            xAxisPres.setUpperBound(starti);
-//            xAxisFlow.setLowerBound(starti-maxX);
-//            xAxisFlow.setUpperBound(starti);
-//        }
-//        starti++;
-//        if(starti>1){
-//            float y = seriesPres.getData().get(starti-2).getYValue().floatValue() - seriesPres.getData().get(starti-1).getYValue().floatValue();
-//            seriesFlow.getData().add(new XYChart.Data<>(starti, -y*50));
-//        }
-//    }
+    public void createMonitorPr1es(){
 
-    public Parent createContent() {
-        xAxis = new NumberAxis(0, 24, 3);
-        final NumberAxis yAxis = new NumberAxis(0, 100, 10);
-        chart = new LineChart<>(xAxis, yAxis);
-        // setup chart
-        final String stockLineChartCss =
-                getClass().getResource("StockLineChart.css").toExternalForm();
-        chart.getStylesheets().add(stockLineChartCss);
-        chart.setCreateSymbols(false);
-        chart.setAnimated(false);
-        chart.setLegendVisible(false);
-        chart.setTitle("ACME Company Stock");
-        xAxis.setLabel("Time");
-        xAxis.setForceZeroInRange(false);
-        yAxis.setLabel("Share Price");
-        yAxis.setTickLabelFormatter(new DefaultFormatter(yAxis, "$", null));
-        // add starting data
-        hourDataSeries = new XYChart.Series<>();
-        hourDataSeries.setName("Hourly Data");
-        minuteDataSeries = new XYChart.Series<>();
-        minuteDataSeries.setName("Minute Data");
-        // create some starting data
-        hourDataSeries.getData().add(new XYChart.Data<Number, Number>(timeInHours,
-                prevY));
-        minuteDataSeries.getData().add(new XYChart.Data<Number, Number>(timeInHours,
-                prevY));
-        for (double m = 0; m < (60); m++) {
-            nextTime();
-            plotTime();
-        }
-        chart.getData().add(minuteDataSeries);
-        chart.getData().add(hourDataSeries);
-        return chart;
     }
 
-    private void nextTime() {
-        if (minutes == 59) {
-            hours++;
-            minutes = 0;
-        } else {
-            minutes++;
-        }
-        timeInHours = hours + ((1d / 60d) * minutes);
+    public Scene createContent(){
+        breath = new Breathing(peep);
+        monitorPres = MonitorBuilder.create()
+                .lineWidth(2)
+                .dotSize(4)
+                .rasterVisible(true)
+                .textVisible(true)
+                .glowVisible(true)
+                .crystalOverlayVisible(true)
+                .lineFading(false)
+                .timespan(Timespan.TEN_SECONDS)
+                .colorTheme(Theme.GREEN)
+                .speedFactor(1)
+                .noOfSegments(150)
+                .data(breath.getPresData())
+                .build();
+
+        monitorFlow = MonitorBuilder.create()
+                .lineWidth(2)
+                .dotSize(4)
+                .rasterVisible(true)
+                .textVisible(true)
+                .glowVisible(true)
+                .crystalOverlayVisible(true)
+                .lineFading(false)
+                .timespan(Timespan.TEN_SECONDS)
+                .colorTheme(Theme.GREEN)
+                .speedFactor(1)
+                .noOfSegments(150)
+                .data(breath.getFlowData())
+                .build();
+
+        JFXTabPane tabPane = new JFXTabPane();
+        tabPane.setBackground(new Background(new BackgroundFill(Color.web("#10163a"), CornerRadii.EMPTY, Insets.EMPTY)));
+
+        //tab main
+        Tab tabMain = new Tab();
+        tabMain.setText("Главная");
+        tabMain.setContent(new Rectangle(200,200, Color.LIGHTSTEELBLUE));
+        tabPane.getTabs().add(tabMain);
+
+        //tab ivl simulator
+        Tab tabGeneratorIVL = new Tab();
+        tabGeneratorIVL.setText("ИВЛ Симулятор");
+        tabGeneratorIVL.setContent(new Rectangle(200,200, Color.LIGHTSTEELBLUE));
+
+        //регулятор volume
+        Label volumeValue = new Label(String.valueOf(volume));
+        volumeValue.setTextFill(Color.WHITE);
+        Label volumeLabel = new Label("VOLUME");
+        volumeLabel.setTextFill(Color.WHITE);
+        JFXSlider sliderVolume = new JFXSlider();
+        sliderVolume.setValue(volume);
+        sliderVolume.setMax(1400);
+        sliderVolume.setMin(0);
+        sliderVolume.setOnMouseReleased(event -> {
+            volume = (int) sliderVolume.getValue();
+            volumeValue.setText(String.valueOf(volume));
+            breath = new Breathing(peep);
+            monitorPres.setData(breath.getPresData());
+        });
+        GridPane vGrid;
+        vGrid = new GridPane();
+        vGrid.setHgap(10);
+        vGrid.setVgap(10);
+        vGrid.add(volumeValue,0,0);
+        vGrid.add(sliderVolume,0,1);
+        vGrid.add(volumeLabel,0,2);
+        VBox volumeComponent = new VBox(10,vGrid);
+
+        //регулятор peep
+        Label peepValue = new Label(String.valueOf(peep));
+        peepValue.setTextFill(Color.WHITE);
+        Label peepLabel = new Label("PEEP");
+        peepLabel.setTextFill(Color.WHITE);
+        JFXSlider peepVolume = new JFXSlider();
+        peepVolume.setValue(peep);
+        peepVolume.setMax(10);
+        peepVolume.setMin(0);
+        peepVolume.setOnMouseReleased(event -> {
+            peep = (int) peepVolume.getValue();
+            peepValue.setText(String.valueOf(peep));
+            breath = new Breathing(peep);
+            monitorPres.setData(breath.getPresData());
+            monitorFlow.setData(breath.getFlowData());
+        });
+        GridPane peepGrid;
+        peepGrid = new GridPane();
+        peepGrid.setHgap(10);
+        peepGrid.setVgap(10);
+        peepGrid.add(peepValue,0,0);
+        peepGrid.add(peepVolume,0,1);
+        peepGrid.add(peepLabel,0,2);
+        VBox peepComponent = new VBox(10,peepGrid);
+
+        //кнопки управления
+        GridPane controlGrid;
+        controlGrid = new GridPane();
+        controlGrid.setVgap(10);
+        controlGrid.setHgap(10);
+        Button butStart = new Button();
+        Button butStop = new Button();
+        butStart.setText("Start");
+        butStop.setText("Stop");
+        butStart.setOnMouseClicked(event -> {
+            monitorPres.start();
+            monitorFlow.start();
+        });
+        butStop.setOnMouseClicked(event -> {
+            monitorPres.stop();
+            monitorFlow.stop();
+        });
+        controlGrid.add(butStart,0,0);
+        controlGrid.add(butStop,1,0);
+        HBox controlComponentCompact = new HBox(10,controlGrid);
+
+        //Собираем всё вместе
+        GridPane gridSim = new GridPane();
+        gridSim.setHgap(20);
+        gridSim.setVgap(10);
+
+        gridSim.add(volumeComponent,0,0);
+        gridSim.add(peepComponent,0,1);
+        gridSim.add(monitorPres,1,0);
+        gridSim.add(monitorFlow,1,1);
+        gridSim.add(controlComponentCompact,1,2);
+
+        gridSim.setPadding(new Insets(10));
+        tabGeneratorIVL.setContent(gridSim);
+
+        tabPane.getTabs().add(tabGeneratorIVL);
+
+        Scene scene = new Scene(tabPane);
+        return scene;
     }
 
-    private void plotTime() {
-        if ((timeInHours % 1) == 0) {
-            // change of hour
-            double oldY = y;
-            y = prevY - 10 + (Math.random() * 20);
-            prevY = oldY;
-            while (y < 10 || y > 90) {
-                y = y - 10 + (Math.random() * 20);
-            }
-            hourDataSeries.getData().add(new Data<Number, Number>(timeInHours,
-                    prevY));
-            // after 25hours delete old data
-            if (timeInHours > 25) {
-                hourDataSeries.getData().remove(0);
-            }
-            // every hour after 24 move range 1 hour
-            if (timeInHours > 24) {
-                xAxis.setLowerBound(xAxis.getLowerBound() + 1);
-                xAxis.setUpperBound(xAxis.getUpperBound() + 1);
-            }
-        }
-        double min = (timeInHours % 1);
-        double randomPickVariance = Math.random();
-        final ObservableList<Data<Number,Number>> minuteList =
-                minuteDataSeries.getData();
 
-        if (randomPickVariance < 0.3) {
-            double minY = prevY + ((y - prevY) * min) - 4 + (Math.random() * 8);
-            minuteList.add(new Data<Number, Number>(timeInHours, minY));
-        } else if (randomPickVariance < 0.7) {
-            double minY = prevY + ((y - prevY) * min) - 6 + (Math.random() * 12);
-            minuteList.add(new Data<Number, Number>(timeInHours, minY));
-        } else if (randomPickVariance < 0.95) {
-            double minY = prevY + ((y - prevY) * min) - 10 + (Math.random() * 20);
-            minuteList.add(new Data<Number, Number>(timeInHours, minY));
-        } else {
-            double minY = prevY + ((y - prevY) * min) - 15 + (Math.random() * 30);
-            minuteList.add(new Data<Number, Number>(timeInHours, minY));
-        }
-        // after 25hours delete old data
-        if (timeInHours > 25) {
-            minuteList.remove(0);
-        }
-    }
-
-    public void play() {
-        final KeyFrame frame =
-                new KeyFrame(Duration.millis(1000 / 60),
-                        (ActionEvent actionEvent) -> {
-                            for (int count = 0; count < 6; count++) {
-                                nextTime();
-                                plotTime();
-                            }
-                        });
-        // create timeline to add new data every 60th of second
-        animation = new Timeline();
-        animation.getKeyFrames().add(frame);
-        animation.setCycleCount(Animation.INDEFINITE);
-        animation.play();
-    }
 
     @Override
     public void stop() {
@@ -178,14 +193,14 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-//        primaryStage.setScene(new Scene(createContent()));
-//        primaryStage.show();
+        primaryStage.setScene(createContent());
+        primaryStage.show();
 //        play();
 
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("bitService Test Tools v1.0");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+//        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+//        primaryStage.setTitle("bitService Test Tools v1.0");
+//        primaryStage.setScene(new Scene(root));
+//        primaryStage.show();
     }
 
 

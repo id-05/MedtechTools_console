@@ -8,11 +8,17 @@ import eu.hansolo.fx.monitor.Monitor;
 import eu.hansolo.fx.monitor.MonitorBuilder;
 import eu.hansolo.fx.monitor.tools.Theme;
 import eu.hansolo.fx.monitor.tools.Timespan;
+
+
+import eu.hansolo.medusa.Gauge;
+import eu.hansolo.medusa.GaugeBuilder;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -24,10 +30,12 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.awt.event.MouseEvent;
 
 
 public class MainApp extends Application {
@@ -37,6 +45,8 @@ public class MainApp extends Application {
     private int peep = 0;
     private int volume = 700;
     Breathing breath;
+    double kTime = 1.5;
+    private Gauge gVolume, gPEEP;
 
     public MainApp() {
         // 6 minutes data per frame
@@ -48,7 +58,46 @@ public class MainApp extends Application {
     }
 
     public Scene createContent(){
-        breath = new Breathing(peep);
+        gVolume = GaugeBuilder.create()
+                .skinType(Gauge.SkinType.BAR)
+                .prefSize(150, 150)
+                .foregroundBaseColor(Color.web("#ebeefd"))
+                .barBackgroundColor(Color.web("#262c49"))
+                .decimals(0)
+                .maxValue(1400)
+                .value(700)
+                .title("VOLUME")
+                .gradientBarEnabled(true)
+                .animated(true)
+                .build();
+
+        gVolume.setOnMousePressed(event -> {
+            int newValue = getAngle(gVolume, event.getSceneX(), event.getSceneY());
+            gVolume.setValue(newValue);
+            volume = (newValue);
+        });
+
+        gPEEP = GaugeBuilder.create()
+                .skinType(Gauge.SkinType.BAR)
+                .prefSize(150, 150)
+                .foregroundBaseColor(Color.web("#ebeefd"))
+                .barBackgroundColor(Color.web("#262c49"))
+                .decimals(0)
+                .maxValue(10)
+                .value(5)
+                .title("PEEP")
+                .gradientBarEnabled(true)
+                .animated(true)
+                .build();
+
+        gPEEP.setOnMousePressed(event -> {
+            int newValue = getAngle(gPEEP, event.getSceneX(), event.getSceneY());
+            gPEEP.setValue(newValue);
+            peep = (newValue);
+        });
+
+        breath = new Breathing(peep,kTime);
+
         monitorPres = MonitorBuilder.create()
                 .lineWidth(2)
                 .dotSize(4)
@@ -93,55 +142,6 @@ public class MainApp extends Application {
         tabGeneratorIVL.setText("ИВЛ Симулятор");
         tabGeneratorIVL.setContent(new Rectangle(200,200, Color.LIGHTSTEELBLUE));
 
-        //регулятор volume
-        Label volumeValue = new Label(String.valueOf(volume));
-        volumeValue.setTextFill(Color.WHITE);
-        Label volumeLabel = new Label("VOLUME");
-        volumeLabel.setTextFill(Color.WHITE);
-        JFXSlider sliderVolume = new JFXSlider();
-        sliderVolume.setValue(volume);
-        sliderVolume.setMax(1400);
-        sliderVolume.setMin(0);
-        sliderVolume.setOnMouseReleased(event -> {
-            volume = (int) sliderVolume.getValue();
-            volumeValue.setText(String.valueOf(volume));
-            breath = new Breathing(peep);
-            monitorPres.setData(breath.getPresData());
-        });
-        GridPane vGrid;
-        vGrid = new GridPane();
-        vGrid.setHgap(10);
-        vGrid.setVgap(10);
-        vGrid.add(volumeValue,0,0);
-        vGrid.add(sliderVolume,0,1);
-        vGrid.add(volumeLabel,0,2);
-        VBox volumeComponent = new VBox(10,vGrid);
-
-        //регулятор peep
-        Label peepValue = new Label(String.valueOf(peep));
-        peepValue.setTextFill(Color.WHITE);
-        Label peepLabel = new Label("PEEP");
-        peepLabel.setTextFill(Color.WHITE);
-        JFXSlider peepVolume = new JFXSlider();
-        peepVolume.setValue(peep);
-        peepVolume.setMax(10);
-        peepVolume.setMin(0);
-        peepVolume.setOnMouseReleased(event -> {
-            peep = (int) peepVolume.getValue();
-            peepValue.setText(String.valueOf(peep));
-            breath = new Breathing(peep);
-            monitorPres.setData(breath.getPresData());
-            monitorFlow.setData(breath.getFlowData());
-        });
-        GridPane peepGrid;
-        peepGrid = new GridPane();
-        peepGrid.setHgap(10);
-        peepGrid.setVgap(10);
-        peepGrid.add(peepValue,0,0);
-        peepGrid.add(peepVolume,0,1);
-        peepGrid.add(peepLabel,0,2);
-        VBox peepComponent = new VBox(10,peepGrid);
-
         //кнопки управления
         GridPane controlGrid;
         controlGrid = new GridPane();
@@ -168,8 +168,8 @@ public class MainApp extends Application {
         gridSim.setHgap(20);
         gridSim.setVgap(10);
 
-        gridSim.add(volumeComponent,0,0);
-        gridSim.add(peepComponent,0,1);
+        gridSim.add(gVolume,0,0);
+        gridSim.add(gPEEP,0,1);
         gridSim.add(monitorPres,1,0);
         gridSim.add(monitorFlow,1,1);
         gridSim.add(controlComponentCompact,1,2);
@@ -181,6 +181,29 @@ public class MainApp extends Application {
 
         Scene scene = new Scene(tabPane);
         return scene;
+    }
+
+    public int getAngle(Gauge gauge, double xMouse, double yMouse){
+        int angleInt;
+        Bounds bounds = gauge.getLayoutBounds();
+        Point2D coordinates = gauge.localToScene(bounds.getMinX(), bounds.getMinY());
+        int X = (int) coordinates.getX();
+        int Y = (int) coordinates.getY();
+        int width = (int) gauge.getWidth();
+        int height = (int) gauge.getHeight();
+        double x0 = X + (double)width/2;
+        double y0 = Y +(double)height/2;
+        double x = xMouse - x0;
+        double y = y0 - yMouse;
+        double theta = Math.atan2(y, x) + 1.5708;
+        int angle;
+        if((180 -  Math.toDegrees(theta))<0){
+            angle = (int)(360 + 180 - Math.toDegrees(theta));
+        }else{
+            angle = (int)(180 - Math.toDegrees(theta));
+        }
+        angleInt = (int)gauge.getMaxValue()*angle/360;
+        return angleInt;
     }
 
 

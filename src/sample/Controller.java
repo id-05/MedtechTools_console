@@ -253,7 +253,7 @@ public class Controller implements Initializable {
     }
 
     public void startLoopGenerate(){
-        breathing = new Breathing(5);
+        breathing = new Breathing(5,1);
         seriesPres.getData().clear();
         seriesFlow.getData().clear();
         xAxisPres.setLowerBound(0);

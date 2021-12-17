@@ -7,7 +7,12 @@ import static java.lang.Math.pow;
 public class Breathing {
 
     int PEEP;
-    int allCount = 450;
+    int allCount = 800;
+    int frequency = 12;
+    int volume = 700;
+    double ie = 2; //I:E
+    String mode = "CMV";
+
     double kLInsp = 2.25;
     double kPInsp = 1.6;
     double kLExsp = 1.125;
@@ -20,13 +25,29 @@ public class Breathing {
         kLExsp = kLExsp * kTime;
     }
 
-    public int getPEEP() {
-        return PEEP;
+    Breathing(int PEEP, double kTime, String mode){
+        this.PEEP = PEEP;
+        this.mode = mode;
+        double t_one = (double)60/frequency;
+        double t_i = (t_one)/(1+ie);
+        double t_e = ie*t_i;
+        allCount = (int)(allCount * kTime);
+        kLInsp = kLInsp * kTime;
+        kPInsp = kPInsp * kTime;
+        kLExsp = kLExsp * kTime;
     }
 
-    public void setPEEP(int PEEP) {
-        this.PEEP = PEEP;
+    public void getAlternateY(int X){
+        switch (mode){
+            case "CMV":{
 
+                break;
+            }
+            case "PCV":{
+                break;
+            }
+            default:break;
+        }
     }
 
     public double getYvalue(int Xvalue){
@@ -74,6 +95,7 @@ public class Breathing {
             }
         }
 
+        yPres = Xvalue;
         return yPres;
     }
 
@@ -91,5 +113,13 @@ public class Breathing {
            data.add( -1*(getYvalue(i-1) - getYvalue(i) ));
         }
         return data;
+    }
+
+    public static enum Mode {
+        CMV,
+        PCV;
+
+        private Mode() {
+        }
     }
 }

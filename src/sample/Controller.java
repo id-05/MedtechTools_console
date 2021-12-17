@@ -306,7 +306,7 @@ public class Controller implements Initializable {
 
     public void changePEEP(){
         peepLabel.setText(String.format("%.0f",peepSlider.getValue()));
-        breathing.setPEEP((int)peepSlider.getValue());
+        //breathing.setPEEP((int)peepSlider.getValue());
     }
 
     public void changeVolume(){

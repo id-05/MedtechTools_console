@@ -42,11 +42,12 @@ public class MainApp extends Application {
 
     //private GridPane grid;
     private Monitor monitorPres, monitorFlow;
-    private int peep = 0;
+    private int peep = 5;
     private int volume = 700;
+    private int frequency = 12;
     Breathing breath;
     double kTime = 1.5;
-    private Gauge gVolume, gPEEP;
+    private Gauge gVolume, gPEEP, gFrequency;
 
     public MainApp() {
         // 6 minutes data per frame
@@ -65,7 +66,7 @@ public class MainApp extends Application {
                 .barBackgroundColor(Color.web("#262c49"))
                 .decimals(0)
                 .maxValue(1400)
-                .value(700)
+                .value(volume)
                 .title("VOLUME")
                 .gradientBarEnabled(true)
                 .animated(true)
@@ -84,7 +85,7 @@ public class MainApp extends Application {
                 .barBackgroundColor(Color.web("#262c49"))
                 .decimals(0)
                 .maxValue(10)
-                .value(5)
+                .value(peep)
                 .title("PEEP")
                 .gradientBarEnabled(true)
                 .animated(true)
@@ -94,6 +95,25 @@ public class MainApp extends Application {
             int newValue = getAngle(gPEEP, event.getSceneX(), event.getSceneY());
             gPEEP.setValue(newValue);
             peep = (newValue);
+        });
+
+        gFrequency = GaugeBuilder.create()
+                .skinType(Gauge.SkinType.BAR)
+                .prefSize(150, 150)
+                .foregroundBaseColor(Color.web("#ebeefd"))
+                .barBackgroundColor(Color.web("#262c49"))
+                .decimals(0)
+                .maxValue(20)
+                .value(frequency)
+                .title("FREQUENCY")
+                .gradientBarEnabled(true)
+                .animated(true)
+                .build();
+
+        gFrequency.setOnMousePressed(event -> {
+            int newValue = getAngle(gFrequency, event.getSceneX(), event.getSceneY());
+            gFrequency.setValue(newValue);
+            frequency = (newValue);
         });
 
         breath = new Breathing(peep,kTime);
@@ -170,6 +190,7 @@ public class MainApp extends Application {
 
         gridSim.add(gVolume,0,0);
         gridSim.add(gPEEP,0,1);
+        gridSim.add(gFrequency,0,2);
         gridSim.add(monitorPres,1,0);
         gridSim.add(monitorFlow,1,1);
         gridSim.add(controlComponentCompact,1,2);
